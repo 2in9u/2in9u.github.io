@@ -1,9 +1,12 @@
 # main links
+# 상단 메뉴바
 main:
-  - title: "Quick-Start Guide"
-    url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
-  # - title: "About"
-  #   url: https://mmistakes.github.io/minimal-mistakes/about/
+  - title: "GitHub"
+    url: https://github.com/2in9u/2in9u.github.io
+  - title: "Naver"
+    url: https://naver.com
+  - title: "Daum"
+    url : https://daum.net
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
