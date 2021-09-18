@@ -20,7 +20,7 @@ title                    : "[📂. 공부 및 취미생활 블로그]"
 title_separator          : "|"
 subtitle                 : "Computer Science | C++ | Computer Graphics" #site tagline that appears below site title in masthead
 name                     : "2in9u"
-description              : "공부 및 취미생활을 올리는 블로그 입니다🖊"
+description              : "🖊"
 url                      : "https://2in9u.github.io/" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "2in9u/2in9u.github.io" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -28,7 +28,7 @@ teaser                   : # path of fallback teaser image, e.g. "/assets/images
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 breadcrumbs              : true # true, false (default)
-words_per_minute         : 250
+words_per_minute         : 200
 comments:
   provider               : # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
   disqus:
@@ -104,12 +104,12 @@ author:
   name             : "In9u👧🏻"
   avatar           : "/assets/images/2in9u_logo_img.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "공부 기록용 블로그입니다! 📖"
-  location         : 
+  location         :
   email            : "wisestarlee@gmail.com"
   links:
-    # - label: "Email"
-    #   icon: "fas fa-fw fa-envelope-square"
-    #   url: "mailto:wisestarlee@gmail.com"
+     - label: "Email"
+       icon: "fas fa-fw fa-envelope-square"
+       url: "mailto:wisestarlee@gmail.com"
     # - label: "Website"
     #   icon: "fas fa-fw fa-link"
         # url: "https://your-website.com"
@@ -281,13 +281,15 @@ defaults:
       path: ""
       type: posts
     values:
-      show_date: true
-      date_format: "%Y-%m-%d"
       layout: single
       author_profile: true
       read_time: true
       comments: true
-      share: true
+      share: false
       related: true
+      show_date: true
+      date_format: "%Y-%m-%d"
+      sidebar_main: true
+      mathjax: true
 
 
