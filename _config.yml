@@ -103,7 +103,7 @@ analytics:
 author:
   name            : "👩🏻‍💻 2in9u"
   avatar          : "/assets/images/2in9u_logo_img.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio             : "공부 기록용 블로그입니다! 📖"
+  bio             : "공부 기록용 블로그 📖"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
