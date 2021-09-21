@@ -2,22 +2,152 @@
 
 <nav class="nav__list">
     <input id="ac-toc" name="according-toc" type="checkbox" />
-    <label for="ac-toc">{{ site.data.ui-text[site.locale].menu_label }}</label>
-    <ui class="nav__items" id="category_tag_menu">
+    <label for="ac-toc">{{ site.data.ul-text[site.locale].menu_label }}</label>
+    <ul class="nav__items" id="category_tag_menu">
         <!-- 전체 글 수 -->
         <li>
-            📚 <span style="font-family:monospace">전체 {{sum}}개</span>
+            📚 <span style="font-family:'IM_Hyemin-Bold'">All ({{sum}})</span>
         </li>
         <li>
             <!-- 카테고리 분류 -->
-            <span class="nav__sub-title">Github Blog</span>
+            <!-- 프로그래밍 언어 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Programming Language</span>
             <!-- 같은 카테고리 페이지 -->
-            <ui>
+            <ul>
                 {% for category in site.categories %}
-                    {% if category[0] == "Blog" %}
-                        <li><a href="/categories/blog" class="">Github Blog ({{category[1].size}})</a></li>
+                    {% if category[0] == "c" %}
+                        <li><a href="/categories/c" class="">◾ C ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ui>
+            </ul>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "cpp" %}
+                        <li><a href="/categories/cpp" class="">◾ C++ ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "csharp" %}
+                        <li><a href="/categories/csharp" class="">◾ C# ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        
+            <!-- 컴퓨터 사이언스 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Computer Science</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "algorithm" %}
+                            <li><a href="/categories/algorithm" class="">◾ Algorithm ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "data_structure" %}
+                            <li><a href="/categories/data_structure" class="">◾ Data Structure ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "design_pattern" %}
+                            <li><a href="/categories/design_pattern" class="">◾ Design Pattern ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+        
+            <!-- 컴퓨터 그래픽스 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Computer Graphics</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "hlsl" %}
+                            <li><a href="/categories/hlsl" class="">◾ HLSL ({{categoty[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "dx12" %}
+                            <li><a href="/categories/dx12" class="">◾ DirectX 12 ({{categoty[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            
+            <!-- 엔진 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Game Engine</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "ue4" %}
+                            <li><a href="/categories/ue4" class="">◾ Unreal Engine 4 ({{categoty[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "ue5" %}
+                            <li><a href="/categories/ue5" class="">◾ Unreal Engine 5 ({{categoty[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+            <!-- 수학 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Mathematics</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "game_math" %}
+                            <li><a href="/categories/game_math" class="">◾ Game Mathematics ({{categoty[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "liner_algebra" %}
+                            <li><a href="/categories/liner_algebra" class="">◾ Liner Algebra ({{categoty[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+        
+            <!-- 깃 관련 카테고리-->
+            <span class="nav__sub-title">🔅 Git</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "git" %}
+                            <li><a href="/categories/git" class="">◾ Git ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+        
+            <!-- 블로그 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Blog</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "blog" %}
+                            <li><a href="/categories/blog" class="">◾ Github Blog ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            
+            <!-- 프로젝트 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Project</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "civil3d_3rdparty" %}
+                            <li><a href="/categories/civil3d_3rdparty" class="">◾ Civil3d 3rd Party Programming ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+            <!-- 코딩테스트 관련 카테고리 -->
+            <span class="nav__sub-title">🔅 Coding Test</span>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "baekjoon" %}
+                        <li><a href="/categories/baekjoon" class="">◾ Baekjoon OJ ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
         </li>
-    </ui>
+    </ul>
