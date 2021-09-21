@@ -1,8 +1,11 @@
 # main links
 # 상단 메뉴바
 main:
+  - title: "Categories"
+    url: /categories/
   - title: "GitHub"
     url: https://github.com/2in9u/2in9u.github.io
+  
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
