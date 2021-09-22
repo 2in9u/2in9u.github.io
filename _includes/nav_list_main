@@ -9,7 +9,7 @@
             📚 <span style="font-family:'IM_Hyemin-Bold'">All ({{sum}})</span>
         </li>
         <hr/>
-        <span style="font-family:sans-serif; font: size 20px;; font-weight:bold;"><a href="/categories/">🌞 Categories 🌞</a></span>
+        <span style="font-family:sans-serif; font: size 20px;; font-weight:bold;"><a href="/categories/">🌞 Categories</a></span>
         <li>
             <!-- 카테고리 분류 -->
             <!-- 프로그래밍 언어 관련 카테고리 -->
