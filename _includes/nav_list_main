@@ -144,12 +144,19 @@
 
             <!-- 코딩테스트 관련 카테고리 -->
             <span class="nav__sub-title">🔅 Coding Test</span>
-            <ul>
-                {% for category in site.categories %}
-                    {% if category[0] == "baekjoon" %}
-                        <li><a href="/categories/baekjoon" class="">◾ Baekjoon OJ ({{category[1].size}})</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "baekjoon" %}
+                            <li><a href="/categories/baekjoon" class="">◾ Baekjoon OJ ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "swea" %}
+                            <li><a href="/categories/swea" class="">◾ SW Expert Academy ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
         </li>
     </ul>
