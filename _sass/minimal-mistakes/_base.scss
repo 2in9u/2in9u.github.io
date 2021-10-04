@@ -110,11 +110,12 @@ blockquote {
   margin: 2em 1em 2em 0;
   padding-left: 1em;
   padding-right: 1em;
-  font-style: italic;
-  border-left: 0.25em solid $primary-color;
+  padding-top: 0.3em;
+  padding-bottom: 0.1em;
+
+  border-left: 0.3em solid $primary-color;
 
   cite {
-    font-style: italic;
 
     &:before {
       content: "\2014";
