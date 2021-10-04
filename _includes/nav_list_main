@@ -136,8 +136,8 @@
             <span class="nav__sub-title">🔅 Project</span>
                 <ul>
                     {% for category in site.categories %}
-                        {% if category[0] == "civil3d_3rdparty" %}
-                            <li><a href="/categories/civil3d_3rdparty" class="">◾ Civil3d 3rd Party Programming ({{category[1].size}})</a></li>
+                        {% if category[0] == "c3d_3rdparty" %}
+                            <li><a href="/categories/c3d_3rdparty" class="">◾ Civil3d 3rd Party Programming ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
