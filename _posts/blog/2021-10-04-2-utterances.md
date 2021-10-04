@@ -1,7 +1,7 @@
 ---
 #layout: posts
 excerpt: ""
-title: "[GitHub Blog] 📂. 🔮Utterances으로 댓글 기능 적용하기"
+title: "[GitHub Blog] 📂. 🔮Utterances로 댓글 기능 적용하기"
 
 categories:
   - blog
@@ -67,6 +67,7 @@ github blog를 셋팅하면서 댓글 기능 적용에 대해서 알아보던 �
 1. 위의 과정을 완료 후 깃허브에 `push` 한 후 블로그를 확인한다.
 2. 다음과 같이 적용된 것을 확인 할 수 있다.
    ![image](../../assets/images/blog_img/2_utterances/comments_result.png)
+> ⁕ 적용 된 결과는 로컬 서버로 접속했을 때 나타나지 않는다.
 
 <br>
 
