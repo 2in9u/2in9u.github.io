@@ -5,6 +5,7 @@ title: "[Civil3d 3rd Party] 📂. Profile Reverse"
 categories:
   - c3d_3rdparty
 
+toc_label: "목차"
 toc: true
 toc_sticky: true
 

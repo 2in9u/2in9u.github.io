@@ -6,6 +6,7 @@ title: "[GitHub Blog] 📂. 🔮Utterances로 댓글 기능 적용하기"
 categories:
   - blog
   
+toc_label: "목차"
 toc: true
 toc_sticky: true
 

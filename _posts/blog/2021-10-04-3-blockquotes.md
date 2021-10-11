@@ -5,7 +5,8 @@ title: "[GitHub Blog] 📂. 인용문(Blockquote) 스타일 변경하기 (minima
 
 categories:
   - blog
-  
+
+toc_label: "목차"
 toc: true
 toc_sticky: true
 
