@@ -15,7 +15,7 @@ toc_sticky: true
 date: 2021-10-19
 last_modified_at: 2021-10-19
 
-published: false
+#published: false
 ---
 
 # 0. 입력(Input)과 출력(Output)
@@ -104,7 +104,7 @@ NEWLINE
 ### 1. Left-Shift
 - left-shift 선언
     ```
-    ; <<< 8
+    ; << 8
     shl eax, 8
     ```
 
@@ -112,22 +112,82 @@ NEWLINE
 ### 2. Right-Shift
 - right-shift 선언
     ```
-    ; >>> 8
+    ; >> 8
     shr eax, 8
     ```
 
 ## 2. 논리(Logical) 연산
 ### 1. NOT
-- 0 → 1, 1 → 0
+- not 0 → 1, not 1 → 0
+
+    |Input|Output|
+    |:----:|:----:|
+    |0|1|
+    |1|0|
+
 - NOT 선언
+    ```
+    ; !al
+    not al
+    ```
 
 ### 2. AND
-- 1 & 1 → 1, 그 외 0
+- 1 and 1 → 1, 그 외 0
+
+    |Input1|Input2|Output|
+    |:----:|:----:|:----:|
+    |0|0|0|
+    |0|1|0|
+    |1|0|0|
+    |1|1|1|
+
+- AND 선언
+    ```
+    ; al & bl
+    and al, bl
+    ```
 
 ### 3. OR
+- 0 or 0 → 0, 그 외 1
+
+    |Input1|Input2|Output|
+    |:----:|:----:|:----:|
+    |0|0|0|
+    |0|1|1|
+    |1|0|1|
+    |1|1|1|
+
+- OR 선언
+    ```
+    ; al | bl
+    or al, bl
+    ```
 
 ### 4. XOR
+- 1 xor 0 → 1, 0 xor 1 → 1, 그 외 0
 
+    |Input1|Input2|Output|
+    |:----:|:----:|:----:|
+    |0|0|0|
+    |0|1|1|
+    |1|0|1|
+    |1|1|0|
+
+- XOR 선언
+    ```
+    ; al ^ bl
+    xor al, bl
+    ```
+<details>
+<summary><span style="color:Gray">✍ XOR의 특징</span></summary>
+<div markdown="1">
+
+A = (A ^ A) ^ A  
+⁕ `암호학`에서 유용하게 사용된다.  
+⁕ `Value XOR Key`
+
+</div>
+</details>
 <br>
 
 # 📑. 참고
