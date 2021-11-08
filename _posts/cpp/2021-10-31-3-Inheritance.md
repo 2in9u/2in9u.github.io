@@ -1,7 +1,7 @@
 ---
 #layout: posts
 excerpt: ""
-title: "[C++] 📂. 생성자(Constructor)와 소멸자(Destructor)"
+title: "[C++] 📂. 상속(Inheritance)"
 
 categories:
     - cpp
@@ -13,7 +13,7 @@ toc: true
 toc_sticky: true
 
 date: 2021-10-31
-last_modified_at: 2021-10-31
+last_modified_at: 2021-11-08
 
 published: false
 ---
@@ -42,8 +42,8 @@ published: false
 class Player
 {
     public:
-        Player() { … }
-        ~Player() { … }
+        Player() { cout << "Player() 기본 생성자 호출" << endl; }
+        ~Player() { cout << "~Player() 소멸자 호출" << endl; }
         void Move();
         void Attack();
         void Die();
@@ -58,8 +58,8 @@ class Player
 class Knight : public Player
 {
     public:
-        Knight() { … }
-        ~Knight() { … }
+        Knight() { cout << "Knight() 기본 생성자 호출" << endl; }
+        ~Knight() { cout << "~Knight() 소멸자 호출" << endl; }
         // 기본 클래스의 함수 재정의
         void Move();
 
@@ -70,8 +70,8 @@ class Knight : public Player
 class Mage : public Player
 {
     public:
-        Mage() { … }
-        ~Mage() { … }
+        Mage() { cout << "Mage() 기본 생성자 호출" << endl; }
+        ~Mage() { cout << "~Mage() 소멸자 호출" << endl; }
 
     public:
         int m_mp;
@@ -81,8 +81,59 @@ class Mage : public Player
 
 <br>
 
-# 3. 자식 클래스의 생성자와 소멸자
+# 3. 파생 클래스의 생성자와 소멸자
+```c++
+int main()
+{
+    Knight k = new Knight();
 
+    return 0;
+}
+```
+
+**Output**
+```c++
+Player() 기본 생성자 호출
+Knight() 기본 생성자 호출
+~Knight() 소멸자 호출
+~Player() 소멸자 호출
+```
+> 1. 파생 클래스의 객체가 생성 될때, 파생 클래스의 생성자 `선처리 영역`에서 기본 생성자를 호출한다.
+> 2. 파생 클래스의 소멸자가 호출 된 후 기본 클래스의 소멸자가 호출된다. (생성자와 순서 `반대`, `후처리 영역`)
+
+<details>
+<summary><span style="color:Gray">✍ 선처리 영역과 후처리 영역</span></summary>
+<div markdown="1">
+
+```c++
+class Knight
+{
+    public:
+        Knight()
+        /*
+            선처리 영역
+            : 파생 클래스 생성자가 호출되기 전에 기본 생성자 호출
+            : Player() 기본 생성자 호출
+        */
+        {
+            // …
+        }
+        
+        ~Knight()
+        {
+            // …
+        }
+        /*
+            후처리 영역
+            : 파생 클래스 소멸자가 호출 된 후 기본 클래스 소멸자 호출
+            : ~Player() 소멸자 호출
+        */
+
+}
+```
+
+</div>
+</details>
 
 <br>
 
