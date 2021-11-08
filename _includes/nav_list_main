@@ -165,5 +165,15 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+            
+            <!-- 기타 카테고리 -->
+            <span class="nav__sub-title">🔅 Others</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "work" %}
+                            <li><a href="/categories/work" class="">◾ Work ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
         </li>
     </ul>
