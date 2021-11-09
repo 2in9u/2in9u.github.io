@@ -15,7 +15,7 @@ toc_sticky: true
 date: 2021-10-31
 last_modified_at: 2021-11-08
 
-published: false
+#published: false
 ---
 
 # 1. 상속성 (Inheritance)
@@ -43,6 +43,7 @@ class Player
 {
     public:
         Player() { cout << "Player() 기본 생성자 호출" << endl; }
+        Player(double hp) { cout << "Player(double) 생성자 호출" << endl; }
         ~Player() { cout << "~Player() 소멸자 호출" << endl; }
         void Move();
         void Attack();
@@ -70,7 +71,7 @@ class Knight : public Player
 class Mage : public Player
 {
     public:
-        Mage() { cout << "Mage() 기본 생성자 호출" << endl; }
+        Mage() : Player(100) { cout << "Mage() 기본 생성자 호출" << endl; }
         ~Mage() { cout << "~Mage() 소멸자 호출" << endl; }
 
     public:
@@ -86,15 +87,25 @@ class Mage : public Player
 int main()
 {
     Knight k = new Knight();
+    cout << endl;
+
+    Mage m = new Mage();
+    cout << endl;
 
     return 0;
 }
 ```
 
 **Output**
-```c++
+```
 Player() 기본 생성자 호출
 Knight() 기본 생성자 호출
+
+Player(douoble) 생성자 호출
+Mage() 기본 생성자 호출
+
+~Mage() 소멸자 호출
+~Player() 소멸자 호출
 ~Knight() 소멸자 호출
 ~Player() 소멸자 호출
 ```
@@ -138,7 +149,16 @@ class Knight
 <br>
 
 # 4. 기본 클래스와 파생 클래스의 객체와 멤버 호출
+```c++
+int main()
+{
+    Knight k = new Knight();
+    k.Move(); // Knight의 재정의 된 Move() 함수 호출
+    k.Player::Move(); // Player의 Move() 함수 호출
 
+    return 0;
+}
+```
 
 <br>
 
