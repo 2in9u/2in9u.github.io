@@ -53,7 +53,7 @@ class Player
         int m_hp;
         int m_attack;
         int m_defence;
-}
+};
 
 // 자식 클래스 = 파생 클래스(Derived Class)
 class Knight : public Player
@@ -66,7 +66,7 @@ class Knight : public Player
 
     public:
         int m_stamina;
-}
+};
 
 class Mage : public Player
 {
@@ -76,7 +76,7 @@ class Mage : public Player
 
     public:
         int m_mp;
-}
+};
 ```
 > Knight 클래스와 Mage 클래스는 Player 클래스를 상속 받았다.
 
@@ -140,7 +140,7 @@ class Knight
             : ~Player() 소멸자 호출
         */
 
-}
+};
 ```
 
 </div>
