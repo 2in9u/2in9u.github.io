@@ -148,6 +148,13 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "mstoolkit_mvvm" %}
+                            <li><a href="/categories/mstoolkit_mvvm" class="">◾ Microsoft.Toolkit.Mvvm ({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
 
             <!-- 코딩테스트 관련 카테고리 -->
             <span class="nav__sub-title">🔅 Coding Test</span>
