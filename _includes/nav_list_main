@@ -178,7 +178,7 @@
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "clean_code" %}
-                            <li><a href="/categories/clean_code" class="">◾ Clean Code({{category[1].size}})</a></li>
+                            <li><a href="/categories/clean_code" class="">◾ Clean Code ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
