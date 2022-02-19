@@ -173,6 +173,15 @@
                     {% endfor %}
                 </ul>
             
+            <!-- 독서 카테고리 -->
+            <span class="nav__sub-title">🔅 Books</span>
+                <ul>
+                    {% for category in site.categories %}
+                        {% if category[0] == "clean_code" %}
+                            <li><a href="/categories/clean_code" class="">◾ Clean Code({{category[1].size}})</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
             <!-- 기타 카테고리 -->
             <span class="nav__sub-title">🔅 Others</span>
                 <ul>
