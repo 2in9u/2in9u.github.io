@@ -182,6 +182,7 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+                
             <!-- 기타 카테고리 -->
             <span class="nav__sub-title">🔅 Others</span>
                 <ul>
