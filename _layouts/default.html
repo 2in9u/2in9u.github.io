@@ -24,7 +24,10 @@
   
     {% include head.html %}
     {% include head/custom.html %}
-  
+    
+    {% if page.use_math %}
+    {% include mathjax_support.html %}
+    {% endif %}
     <style> 
       ::-webkit-scrollbar{width: 16px;}
       ::-webkit-scrollbar-track {background-color: #e8d5b7; border-radius: 16px;}
