@@ -16,6 +16,7 @@ last_modified_at: 2023-01-15
 # 🔷 초기화
 ## 🔹 Engine
 - 엔진의 핵심적인 기능을 담당하는 클래스
+
 ```cpp
 class Engine
 {
@@ -23,9 +24,9 @@ public:
     void Init(const HWND& hwnd, const int32 width, const int32 height, bool windowed);
 
 public:
-    void Render();
-    void Start();
-    void End();
+    void Render();	// 객체를 그려주는 부분
+    void Start();	// 객체를 그려주기 전 CommandQueue를 설정하는 부분
+    void End();		// 그려 줄 객체를 모두 설정한 뒤 CommandQueue를 닫아주는 부분
     ...
 
 private:
@@ -48,12 +49,12 @@ void Engine::Init(const HWND& hwnd, const int32 width, const int32 height, bool 
     // 그려질 화면 크기 설정
 	_viewport = { 0,0,static_cast<FLOAT>(window.width), static_cast<FLOAT>(window.height), 0.0f, 1.0f };
 	_scissorRect = CD3DX12_RECT(0, 0, window.width, window.height);
-	// ptr
+	// Device, CommandQueue, SwapChain, DescriptorHeap 생성
 	_device = make_shared<Device>();
 	_cmdQueue = make_shared<CommandQueue>();
 	_swapChain = make_shared<SwapChain>();
 	_descHeap = make_shared<DescriptorHeap>();
-	// init
+	// Device, CommandQueue, SwapChain, DescriptorHeap 초기화
 	_device->Init();
 	_cmdQueue->Init(_device->GetDevice(), _swapChain, _descHeap);
 	_swapChain->Init(window, _device->GetDXGI(), _cmdQueue->GetCommandQueue());
@@ -81,7 +82,8 @@ void Engine::End()
 <br>
 
 ## 🔹 Device
-- 인력 사무소
+- 인력 사무소  
+
 ```cpp
 class Device
 {
@@ -90,29 +92,27 @@ public:
     ...
 
 private:
-	ComPtr<ID3D12Debug>		_debug;
-	ComPtr<IDXGIFactory>	_dxgi; // display
-	ComPtr<ID3D12Device>	_device; // GPU
+	...
+	ComPtr<IDXGIFactory>	_dxgi;		// 화면 관련 기능
+	ComPtr<ID3D12Device>	_device;	// 각종 객체 생성 (GPU)
 };
 ```
 
 ```cpp
 void Device::Init()
 {
-#ifdef _DEBUG
-	::D3D12GetDebugInterface(IID_PPV_ARGS(&_debug));
-	_debug->EnableDebugLayer();
-#endif
+	...
 
-	::CreateDXGIFactory(IID_PPV_ARGS(&_dxgi));
-	::D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device));
+	::CreateDXGIFactory(IID_PPV_ARGS(&_dxgi));	// _dxgi 생성
+	::D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device)); // _device  생성
 }
 ```
 
 <br>
 
 ## 🔹 CommandQueue
-- 외주 일감 목록
+- 외주 일감 목록  
+
 ```cpp
 class CommandQueue
 {
@@ -121,40 +121,37 @@ public:
     ...
 
 public:
-	void WaitSync();
+	void WaitSync(); // CPU/GPU 동기화 함수
 	void RenderBegin(const D3D12_VIEWPORT* viewport, const D3D12_RECT* rect);
 	void RenderEnd();
 	...
 
 private:
-	ComPtr<ID3D12CommandQueue>		_cmdQueue;
-	ComPtr<ID3D12CommandAllocator>	_cmdAlloc;
-	ComPtr<ID3D12GraphicsCommandList>		_cmdList;
+	ComPtr<ID3D12CommandQueue>			_cmdQueue;
+	ComPtr<ID3D12CommandAllocator>		_cmdAlloc;
+	ComPtr<ID3D12GraphicsCommandList>	_cmdList;
 
 	ComPtr<ID3D12Fence>				_fence;
-	uint32							_fenceValue = 0;
-	HANDLE							_fenceEvent = INVALID_HANDLE_VALUE;
+	uint32							_fenceValue = 0; // 시간상의 특정 울타리 지점을 식별하는 정수
 
-	shared_ptr<SwapChain>			_swapChain;
-	shared_ptr<DescriptorHeap>		_descHeap;
+	...
 };
 ```
 
 ```cpp
 void CommandQueue::Init(ComPtr<ID3D12Device> device, shared_ptr<SwapChain> swapChain, shared_ptr<DescriptorHeap> descHeap)
 {
-	_swapChain = swapChain;
-	_descHeap = descHeap;
+	...
 
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
-	device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_cmdQueue));
-	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_cmdAlloc));
-	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _cmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_cmdList));
+	device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_cmdQueue));	// CommandQuque 생성
+	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_cmdAlloc));	// CommandAllocator 생성
+	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _cmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_cmdList));	// CommandList 생성
 
-	device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence));
+	device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence));	// Fence 생성
 	_fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);	
 }
 
@@ -185,6 +182,7 @@ void CommandQueue::RenderBegin(const D3D12_VIEWPORT* viewport, const D3D12_RECT*
 	_cmdList->RSSetViewports(1, viewport);
 	_cmdList->RSSetScissorRects(1, rect);
 
+	// 화면 뒷 배경 설정
 	D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = _descHeap->GetBackBufferView();
 	_cmdList->ClearRenderTargetView(backBufferView, Colors::BlanchedAlmond, 0, nullptr);
 	_cmdList->OMSetRenderTargets(1, &backBufferView, FALSE, nullptr);
@@ -201,7 +199,7 @@ void CommandQueue::RenderEnd()
 	_cmdList->Close();
 
 	ID3D12CommandList* cmdListArr[] = { _cmdList.Get() };
-	_cmdQueue->ExecuteCommandLists(_countof(cmdListArr), cmdListArr);
+	_cmdQueue->ExecuteCommandLists(_countof(cmdListArr), cmdListArr);	// 실행
 
 	_swapChain->Present();
 
@@ -214,7 +212,8 @@ void CommandQueue::RenderEnd()
 <br>
 
 ## 🔹 SwaphChain
-- 교환 사슬
+- 교환 사슬  
+
 ```cpp
 class SwapChain
 {
@@ -229,7 +228,8 @@ public:
 private:
 	ComPtr<IDXGISwapChain>	_swapChain;
 	ComPtr<ID3D12Resource>	_renderTargets[SWAP_CHAIN_BUFFER_COUNT];
-	uint32					_backBufferIndex = 0;
+	
+	...
 };
 ```
 
@@ -272,11 +272,11 @@ void SwapChain::SwapIndex()
 }
 ```
 
-
 <br>
 
 ## 🔹 DescriptorHeap
-- 기안서
+- 기안서  
+
 ```cpp
 class DescriptorHeap
 {
@@ -286,8 +286,7 @@ public:
 
 private:
 	ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
-	uint32							_rtvHeapSize = 0;
-	D3D12_CPU_DESCRIPTOR_HANDLE		_rtvHandle[SWAP_CHAIN_BUFFER_COUNT];
+	...
 
 	shared_ptr<class SwapChain>		_swapChain;
 };
@@ -318,8 +317,18 @@ void DescriptorHeap::Init(ComPtr<ID3D12Device> device, shared_ptr<class SwapChai
 }
 ```
 
+<br>
+
+---
+## 🔹 참조관계  
+![image](../../assets/images/dx12_img/02_initialize/engine_ref.png)  
+
+<br>
+
+![image](../../assets/images/dx12_img/02_initialize/others_ref.png)  
 
 <br>
 
 # 📑. 참고
 * [Rookiss. [C++과 언리얼로 만드는 MMORPG 게임 개발 시리즈]Part2: 게임 수학과 DirectX12. Inflearn.](https://www.inflearn.com/course/%EC%96%B8%EB%A6%AC%EC%96%BC-3d-mmorpg-2/dashboard)
+* [프랭크 D. 루나(2020). DirectX 12를 이용한 3D게임 프로그래밍 입문. 한빛미디어(주).](https://www.hanbit.co.kr/store/books/look.php?p_code=B5088646371)
