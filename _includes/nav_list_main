@@ -73,14 +73,14 @@
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "hlsl" %}
-                            <li><a href="/categories/hlsl" class="">◾ HLSL ({{categoty[1].size}})</a></li>
+                            <li><a href="/categories/hlsl" class="">◾ HLSL ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "dx12" %}
-                            <li><a href="/categories/dx12" class="">◾ DirectX 12 ({{categoty[1].size}})</a></li>
+                            <li><a href="/categories/dx12" class="">◾ DirectX 12 ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
@@ -90,14 +90,14 @@
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "ue4" %}
-                            <li><a href="/categories/ue4" class="">◾ Unreal Engine 4 ({{categoty[1].size}})</a></li>
+                            <li><a href="/categories/ue4" class="">◾ Unreal Engine 4 ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "ue5" %}
-                            <li><a href="/categories/ue5" class="">◾ Unreal Engine 5 ({{categoty[1].size}})</a></li>
+                            <li><a href="/categories/ue5" class="">◾ Unreal Engine 5 ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
@@ -107,14 +107,14 @@
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "game_math" %}
-                            <li><a href="/categories/game_math" class="">◾ Game Mathematics ({{categoty[1].size}})</a></li>
+                            <li><a href="/categories/game_math" class="">◾ Game Mathematics ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
                 <ul>
                     {% for category in site.categories %}
                         {% if category[0] == "liner_algebra" %}
-                            <li><a href="/categories/liner_algebra" class="">◾ Liner Algebra ({{categoty[1].size}})</a></li>
+                            <li><a href="/categories/liner_algebra" class="">◾ Liner Algebra ({{category[1].size}})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
