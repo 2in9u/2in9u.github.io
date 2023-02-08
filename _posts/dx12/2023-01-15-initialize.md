@@ -13,8 +13,9 @@ date: 2023-01-15
 last_modified_at: 2023-01-15
 #published: false
 ---
+
 # 🔷 초기화
-## 🔹 Engine
+## 🔹 Engine Class
 - 엔진의 핵심적인 기능을 담당하는 클래스
 
 ```cpp
@@ -73,7 +74,7 @@ void Engine::End()
 
 <br>
 
-## 🔹 Device
+## 🔹 Device Class
 - 인력 사무소  
 
 ```cpp
@@ -97,7 +98,8 @@ private:
 ```
 
 2) [ID3D12Device](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12device) 선언
-- 가상 어댑터 (command allocator, command list, command queue, fence, resource, pipeline state object, heap, root signature, sampler, resource view ... 생성 가능)
+- 가상 어댑터  
+- command allocator, command list, command queue, fence, resource, pipeline state object, heap, root signature, sampler, resource view ... 생성 가능  
 ```cpp
 ::D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device));
 ```
@@ -105,9 +107,9 @@ private:
 
 <br>
 
-## 🔹 CommandQueue
+## 🔹 CommandQueue Class
 - 외주 일감 목록  
-
+ 
 ```cpp
 class CommandQueue
 {
@@ -162,6 +164,7 @@ device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence));	// Fence �
 _fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);	
 ```
 ---
+
 ```cpp
 void CommandQueue::WaitSync()
 {
@@ -176,6 +179,7 @@ void CommandQueue::WaitSync()
 	}
 }
 ```
+
 ```cpp
 void CommandQueue::RenderBegin(const D3D12_VIEWPORT* viewport, const D3D12_RECT* rect)
 {
@@ -217,11 +221,13 @@ void CommandQueue::RenderEnd()
 	_swapChain->SwapIndex();
 }
 ```
+
 ---
 
 <br>
 
-## 🔹 SwaphChain
+## 🔹 SwaphChain Class
+- 화면에 표시 될 정보를 바꾸어주는 클래스  
 - 교환 사슬  
 
 ```cpp
@@ -244,23 +250,24 @@ private:
 ```
 ---
 1) [IDXGISwapChain](https://learn.microsoft.com/ko-kr/windows/win32/api/dxgi/nn-dxgi-idxgiswapchain)
-- 렌더링된 데이터를 출력에 표시하기 전에 저장하기 위해 하나 이상의 Surface를 구현
+- 렌더링된 데이터를 출력에 표시하기 전에 저장하기 위해 하나 이상의 Surface를 구현  
+
 ```cpp
 DXGI_SWAP_CHAIN_DESC chainDesc = {};
 chainDesc.BufferDesc.Width = static_cast<uint32>(window.width);
 chainDesc.BufferDesc.Height = static_cast<uint32>(window.height);
-chainDesc.BufferDesc.RefreshRate.Numerator = 60;							// 화면 갱신 비율
-chainDesc.BufferDesc.RefreshRate.Denominator = 1;							// 화면 갱신 비율
-chainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;					// 버퍼의 디스플레이 형식
+chainDesc.BufferDesc.RefreshRate.Numerator = 60;			// 화면 갱신 비율
+chainDesc.BufferDesc.RefreshRate.Denominator = 1;			// 화면 갱신 비율
+chainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// 버퍼의 디스플레이 형식
 chainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 chainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-chainDesc.SampleDesc.Count = 1;												// 멀티 샘플링 OFF
+chainDesc.SampleDesc.Count = 1;								// 멀티 샘플링 OFF
 chainDesc.SampleDesc.Quality = 0;
-chainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;					// 후면 버퍼에 렌더링할 것 
-chainDesc.BufferCount = SWAP_CHAIN_BUFFER_COUNT;							// 전면+후면 버퍼
+chainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;		// 후면 버퍼에 렌더링할 것 
+chainDesc.BufferCount = SWAP_CHAIN_BUFFER_COUNT;				// 전면+후면 버퍼
 chainDesc.OutputWindow = window.hwnd;
 chainDesc.Windowed = window.windowed;
-chainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;						// 전면 후면 버퍼 교체 시 이전 프레임 정보 버림
+chainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			// 전면 후면 버퍼 교체 시 이전 프레임 정보 버림
 chainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 dxgi->CreateSwapChain(cmdQueue.Get(), &chainDesc, &_swapChain);
@@ -284,7 +291,8 @@ void SwapChain::SwapIndex()
 
 <br>
 
-## 🔹 DescriptorHeap
+## 🔹 DescriptorHeap Class
+- 화면에 표시되는 정보(RTV)를 생성하는 클래스  
 - 기안서  
 
 ```cpp
@@ -301,6 +309,10 @@ private:
 	shared_ptr<class SwapChain>		_swapChain;
 };
 ```
+---
+1) [ID3D12DescriptorHeap](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12descriptorheap)
+- 설명자의 연속 할당 컬렉션으로, 모든 설명자에 대한 하나의 할당  
+- SRV, UAV, CBV, Sampler (파이프라인 상태 개체(Pipeline State Object:PSO)에 속하지 않은 유형)  
 
 ```cpp
 void DescriptorHeap::Init(ComPtr<ID3D12Device> device, shared_ptr<class SwapChain> swapChain)
@@ -332,6 +344,8 @@ void DescriptorHeap::Init(ComPtr<ID3D12Device> device, shared_ptr<class SwapChai
 ---
 ## 🔹 참조관계  
 ![image](../../assets/images/dx12_img/02_initialize/engine_ref.png)  
+
+> DescriptorHeap 클래스를 SwapChain 클래스에 포함하도록 변경하는게 좋을 것 같음
 
 <br>
 
