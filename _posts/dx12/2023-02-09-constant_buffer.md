@@ -12,7 +12,7 @@ toc_sticky: true
 date: 2023-02-09
 last_modified_at: 2023-02-09
 
-published: false
+#published: false
 ---
 
 # 🔷 Constant Buffer
@@ -184,6 +184,25 @@ float4 PS_Main(VS_OUT input) : SV_Target
     return input.color;
 }
 ```
+
+<br>
+
+## 4. Mesh에서 값 설정
+```cpp
+void Mesh::Render()
+{
+	ComPtr<ID3D12GraphicsCommandList> cmdList = MyEngine->GetCommandQueue()->GetCommandList();
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);								// 정점 3개(삼각형) 단위 설정
+	cmdList->IASetVertexBuffers(0, 1, &_vertexBufferView);									// Slot: (0~15)	// 버퍼 주소(위치)
+
+	MyEngine->GetConstantBuffer()->PushData(0, &_transform, sizeof(_transform)); // 좌표
+	MyEngine->GetConstantBuffer()->PushData(1, &_transform, sizeof(_transform)); // 색
+
+	cmdList->DrawInstanced(_vertexCount, 1, 0, 0);	// 실제로 그려짐
+}
+```
+
+<br>
 
 # 📑. 참고
 * [Rookiss. [C++과 언리얼로 만드는 MMORPG 게임 개발 시리즈]Part2: 게임 수학과 DirectX12. Inflearn.](https://www.inflearn.com/course/%EC%96%B8%EB%A6%AC%EC%96%BC-3d-mmorpg-2/dashboard)

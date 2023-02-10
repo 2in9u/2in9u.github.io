@@ -155,6 +155,7 @@ queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_cmdQueue));	// ID3D12CommandQueue
 device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_cmdAlloc));	// ID3D12CommandAllocator
 device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _cmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_cmdList));	// ID3D12GraphicsCommandList
+_cmdList->Close(); // 닫아준다
 ```
 
 4) [ID3D12Fence](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12fence) 선언

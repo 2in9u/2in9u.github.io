@@ -13,6 +13,7 @@ date: 2023-01-05
 last_modified_at: 2023-01-06
 #published: false
 ---
+
 # 🔷 프로젝트 설정
 ## 🔹 프로젝트 초기 설정
 ![image](../../assets/images/dx12_img/01_projectsetting/solution_structure.png)
