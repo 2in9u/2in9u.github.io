@@ -12,7 +12,7 @@ toc_sticky: true
 date: 2023-02-08
 last_modified_at: 2023-02-08
 
-published: false
+#published: false
 ---
 
 # 🔷 기본 입출력
