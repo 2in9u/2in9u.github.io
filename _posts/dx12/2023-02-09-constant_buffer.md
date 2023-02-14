@@ -17,132 +17,99 @@ last_modified_at: 2023-02-09
 
 # 🔷 Constant Buffer
 
-## 1. Root Signature 변경
+## 1. Root Signature의 파라미터에 상수 버퍼 생성
 
 ```cpp
-#include "pch.h"
-#include "RootSignature.h"
-
-void RootSignature::Init(ComPtr<ID3D12Device> device)
-{
-	CD3DX12_ROOT_PARAMETER param[2];
-	param[0].InitAsConstantBufferView(0); // b0 (CBV)
-	param[1].InitAsConstantBufferView(1); // b1
-
-	D3D12_ROOT_SIGNATURE_DESC desc = CD3DX12_ROOT_SIGNATURE_DESC(2, param);
-	desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	ComPtr<ID3DBlob> blobSignature;
-	ComPtr<ID3DBlob> blobError;
-	::D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blobSignature, &blobError);
-	device->CreateRootSignature(0, blobSignature->GetBufferPointer(), blobSignature->GetBufferSize(), IID_PPV_ARGS(&_signature));
-}
-
+// (1) 상수버퍼 생성
+CD3DX12_ROOT_PARAMETER param[2];
+param[0].InitAsConstantBufferView(0); // b0 (CBV)
+param[1].InitAsConstantBufferView(1); // b1
+// (2) 파라미터 정보 설정
+D3D12_ROOT_SIGNATURE_DESC desc = CD3DX12_ROOT_SIGNATURE_DESC(2, param);
 ```
+
+<br>
 
 ## 2. ConstantBuffer Class
+- 상수 버퍼를 관리하는 클래스  
+
+> `상수 버퍼(constant buffer)`
+> - 셰이더 프로그램에서 참조하는 상수 자료를 담는 GPU자원  
+> - CPU가 프레임 마다 한 번씩 갱신하는 것이 일반적  
+> - 버퍼의 크기는 최소하드웨어 할당 크기(256byte)의 배수  
+
+---
 
 ```cpp
-#pragma once
-class ConstantBuffer
-{
-public:
-	ConstantBuffer();
-	~ConstantBuffer();
+ComPtr<ID3D12Resource>	_cbvBuffer; // 상수 버퍼
+BYTE*					_mappedBuffer = nullptr;
+uint32					_elementSize = 0;
+uint32					_elementCount = 0;
 
-	void Init(uint32 size, uint32 count);
-
-public:
-	void Clear();
-	void PushData(int32 rootParamIndex, void* buffer, uint32 size);
-
-	D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress(uint32 index);
-
-private:
-	void CreateBuffer();
-
-private:
-	ComPtr<ID3D12Resource>	_cbvBuffer;
-	BYTE*					_mappedBuffer = nullptr;
-	uint32					_elementSize = 0;
-	uint32					_elementCount = 0;
-
-	uint32					_currentIndex = 0;
-};
+uint32					_currentIndex = 0;
 ```
+
+1) 상수버퍼 크기 및 개수 설정
 
 ```cpp
-#include "pch.h"
-#include "ConstantBuffer.h"
-#include "Engine.h"
-#include "Device.h"
-#include "CommandQueue.h"
-
-ConstantBuffer::ConstantBuffer()
-{
-}
-
-ConstantBuffer::~ConstantBuffer()
-{
-	if (_cbvBuffer)
-	{
-		if (_cbvBuffer != 0)
-			_cbvBuffer->Unmap(0, nullptr);
-
-		_cbvBuffer = nullptr;
-	}
-}
-
-void ConstantBuffer::Init(uint32 size, uint32 count)
-{
-	_elementSize = (size + 255) & ~255;
-	_elementCount = count;
-
-	CreateBuffer();
-}
-
-void ConstantBuffer::Clear()
-{
-	_currentIndex = 0;
-}
-
-void ConstantBuffer::PushData(int32 rootParamIndex, void* buffer, uint32 size)
-{
-	assert(_currentIndex < _elementSize);
-
-	::memcpy(&_mappedBuffer[_currentIndex * _elementSize], buffer, size);
-
-	D3D12_GPU_VIRTUAL_ADDRESS address = GetGpuVirtualAddress(_currentIndex);
-	MyEngine->GetCommandQueue()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParamIndex, address);
-	_currentIndex++;
-}
-
-D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGpuVirtualAddress(uint32 index)
-{
-	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = _cbvBuffer->GetGPUVirtualAddress();
-	objCBAddress += index * _elementSize;
-	return objCBAddress;
-}
-
-void ConstantBuffer::CreateBuffer()
-{
-	uint32 bufferSize = _elementSize * _elementCount;
-	D3D12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
-
-	MyEngine->GetDevice()->GetDevice()->CreateCommittedResource(
-		&heapProperty,
-		D3D12_HEAP_FLAG_NONE,
-		&desc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&_cbvBuffer));
-
-	_cbvBuffer->Map(0, nullptr, reinterpret_cast<void**>(&_mappedBuffer));
-}
+_elementSize = (size + 255) & ~255;	// 크기 (256byte의 배수)
+_elementCount = count;				// 버퍼 개수
 ```
 
-## 3. HLSL
+2) 상수버퍼 생성
+
+```cpp
+uint32 bufferSize = _elementSize * _elementCount;
+D3D12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD); // 업로드 힙
+D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
+
+// 상수버퍼 생성
+MyEngine->GetDevice()->GetDevice()->CreateCommittedResource(
+	&heapProperty,
+	D3D12_HEAP_FLAG_NONE,
+	&desc,
+	D3D12_RESOURCE_STATE_GENERIC_READ,
+	nullptr,
+	IID_PPV_ARGS(&_cbvBuffer));
+```
+
+3) 상수버퍼 값 설정
+
+```cpp
+// (1) 자료를 올리기 위한 상수버퍼를 가리키는 포인터 얻기
+_cbvBuffer->Map(0, nullptr, reinterpret_cast<void**>(&_mappedBuffer));
+assert(_currentIndex < _elementSize);
+// (2) CPU(시스템메모리)에서 자료를 상수버퍼에 복사
+::memcpy(&_mappedBuffer[_currentIndex * _elementSize], buffer, size);
+```
+
+4) 상수버퍼 파이프라인에 바인딩
+```cpp
+D3D12_GPU_VIRTUAL_ADDRESS address = GetGpuVirtualAddress(_currentIndex);
+MyEngine->GetCommandQueue()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParamIndex, address);
+_currentIndex++;
+```
+
+> `상수버퍼 포인터 얻기`
+>
+> ```cpp
+>	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = _cbvBuffer->GetGPUVirtualAddress(); // GPU상의 시작주소를 알려준다
+>	objCBAddress += index * _elementSize;
+>	return objCBAddress;
+> ```
+
+> `Mesh에서 값 설정`
+>```cpp
+>MyEngine->GetConstantBuffer()->PushData(0, &_transform, sizeof(_transform)); // 좌표 (b0)
+>MyEngine->GetConstantBuffer()->PushData(1, &_transform, sizeof(_transform)); // 색 (b1)
+>```
+
+<br>
+
+## 3. HLSL에 상수버퍼 자료 추가
+
+1) 상수버퍼 
+- register `b`를 사용한다  
 
 ```cpp
 cbuffer TEST_b0 : register(b0)
@@ -154,51 +121,19 @@ cbuffer TEST_b1 : register(b1)
 {
     float4 offset1;
 }
+```
 
-struct VS_IN
-{
-    float3 pos : POSITION;
-    float4 color : COLOR;
-};
-
-struct VS_OUT
-{
-    float4 pos : SV_Position;
-    float4 color : COLOR;
-};
-
+```cpp
 VS_OUT VS_Main(VS_IN input)
 {
     VS_OUT output = (VS_OUT)0;
 
     output.pos = float4(input.pos, 1.f);
-    output.pos += offset0;
+    output.pos += offset0; // pos에 상수버퍼 값 더하기
     output.color = input.color;
-    output.color += offset1;
+    output.color += offset1; // color에 상수버퍼 값 더하기
 
     return output;
-}
-
-float4 PS_Main(VS_OUT input) : SV_Target
-{
-    return input.color;
-}
-```
-
-<br>
-
-## 4. Mesh에서 값 설정
-```cpp
-void Mesh::Render()
-{
-	ComPtr<ID3D12GraphicsCommandList> cmdList = MyEngine->GetCommandQueue()->GetCommandList();
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);								// 정점 3개(삼각형) 단위 설정
-	cmdList->IASetVertexBuffers(0, 1, &_vertexBufferView);									// Slot: (0~15)	// 버퍼 주소(위치)
-
-	MyEngine->GetConstantBuffer()->PushData(0, &_transform, sizeof(_transform)); // 좌표
-	MyEngine->GetConstantBuffer()->PushData(1, &_transform, sizeof(_transform)); // 색
-
-	cmdList->DrawInstanced(_vertexCount, 1, 0, 0);	// 실제로 그려짐
 }
 ```
 

@@ -19,57 +19,33 @@ last_modified_at: 2023-01-15
 - 엔진의 핵심적인 기능을 담당하는 클래스
 
 ```cpp
-class Engine
-{
-public:
-    void Init(const HWND& hwnd, const int32 width, const int32 height, bool windowed);
-
-public:
-    void Start();	// 객체를 그려주기 전 CommandQueue를 설정하는 부분
-    void End();		// 그려 줄 객체를 모두 설정한 뒤 CommandQueue를 닫아주는 부분
-    ...
-
-private:
-    ...
-    // 그려질 화면 크기 정보를 가짐
-	D3D12_VIEWPORT	_viewport = {};		
-	D3D12_RECT	_scissorRect = {};	
-
-	shared_ptr<class Device>		_device;
-	shared_ptr<class CommandQueue>		_cmdQueue;
-	shared_ptr<class SwapChain>		_swapChain;
-	shared_ptr<class DescriptorHeap>	_descHeap;
-};
+// 그려질 화면 크기 정보를 가짐
+D3D12_VIEWPORT	_viewport = {};		
+D3D12_RECT	_scissorRect = {};	
+// 
+shared_ptr<class Device>			_device;
+shared_ptr<class CommandQueue>		_cmdQueue;
+shared_ptr<class SwapChain>			_swapChain;
+shared_ptr<class DescriptorHeap>	_descHeap;
 ```
 
 ```cpp
-void Engine::Init(const HWND& hwnd, const int32 width, const int32 height, bool windowed)
-{
-    ...
-    // 그려질 화면 크기 설정
-	_viewport = { 0,0,static_cast<FLOAT>(window.width), static_cast<FLOAT>(window.height), 0.0f, 1.0f };
-	_scissorRect = CD3DX12_RECT(0, 0, window.width, window.height);
-	// Device, CommandQueue, SwapChain, DescriptorHeap 생성
-	_device = make_shared<Device>();
-	_cmdQueue = make_shared<CommandQueue>();
-	_swapChain = make_shared<SwapChain>();
-	_descHeap = make_shared<DescriptorHeap>();
-	// Device, CommandQueue, SwapChain, DescriptorHeap 초기화
-	_device->Init();
-	_cmdQueue->Init(_device->GetDevice(), _swapChain, _descHeap);
-	_swapChain->Init(window, _device->GetDXGI(), _cmdQueue->GetCommandQueue());
-	_descHeap->Init(_device->GetDevice(), _swapChain);
-}
+...
+// (1) 응용 프로그램에 대한 뷰포트, 가위 직사각형 정보 설정
+_viewport = { 0,0,static_cast<FLOAT>(window.width), static_cast<FLOAT>(window.height), 0.0f, 1.0f };
+_scissorRect = CD3DX12_RECT(0, 0, window.width, window.height);
 
-void Engine::Start()
-{
-	_cmdQueue->RenderBegin(&_viewport, &_scissorRect);
-}
+// (2) Device, CommandQueue, SwapChain, DescriptorHeap 생성
+_device = make_shared<Device>();
+_cmdQueue = make_shared<CommandQueue>();
+_swapChain = make_shared<SwapChain>();
+_descHeap = make_shared<DescriptorHeap>();
 
-void Engine::End()
-{
-	_cmdQueue->RenderEnd();
-}
+// (3) Device, CommandQueue, SwapChain, DescriptorHeap 초기화
+_device->Init();
+_cmdQueue->Init(_device->GetDevice(), _swapChain, _descHeap);
+_swapChain->Init(window, _device->GetDXGI(), _cmdQueue->GetCommandQueue());
+_descHeap->Init(_device->GetDevice(), _swapChain);
 ```
 
 <br>
@@ -78,19 +54,12 @@ void Engine::End()
 - 각종 객체를 생성할 수 있는 device와 _dxgi를 관리하는 클래스  
 - 인력 사무소  
 
-```cpp
-class Device
-{
-public:
-	void Init();
-	...
-private:
-	...
-	ComPtr<IDXGIFactory>	_dxgi;		// 화면 관련 기능
-	ComPtr<ID3D12Device>	_device;	// 각종 객체 생성 (GPU)
-};
-```
 ---
+
+```cpp
+ComPtr<IDXGIFactory>	_dxgi;		// 화면 관련 기능
+ComPtr<ID3D12Device>	_device;	// 각종 객체 생성 (GPU)
+```
 
 1) [IDXGIFactory](https://learn.microsoft.com/ko-kr/windows/win32/api/dxgi/nn-dxgi-idxgifactory) 선언
 - 전체 화면 전환을 처리하는 DXGI 개체릴 생성하는 메서드를 구현
@@ -104,6 +73,7 @@ private:
 ```cpp
 ::D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device));
 ```
+
 ---
 
 <br>
@@ -115,41 +85,39 @@ private:
 > CPU는 그리기 명령이 담긴 명령 목록(Command List)을 DirectX API를 통해 대기열에 제출한다.  
 > 하지만, 명령은 제출하는 즉시 시행되지 않는다.  
 
-```cpp
-class CommandQueue
-{
-public: 
-	void Init(ComPtr<ID3D12Device> device, shared_ptr<SwapChain> swapChain, shared_ptr<DescriptorHeap> descHeap);
-    ...
-
-public:
-	void WaitSync(); // CPU와 GPU 동기화 함수
-	void RenderBegin(const D3D12_VIEWPORT* viewport, const D3D12_RECT* rect); // 명령 입력 전 처리
-	void RenderEnd(); // 명력 입력 끝 처리
-	...
-
-private:
-	ComPtr<ID3D12CommandQueue>			_cmdQueue;
-	ComPtr<ID3D12CommandAllocator>		_cmdAlloc;
-	ComPtr<ID3D12GraphicsCommandList>	_cmdList;
-
-	ComPtr<ID3D12Fence>				_fence;
-	uint32							_fenceValue = 0; // 시간상의 특정 울타리 지점을 식별하는 정수
-
-	...
-};
-```
 ---
+
+```cpp
+ComPtr<ID3D12CommandQueue>			_cmdQueue;
+ComPtr<ID3D12CommandAllocator>		_cmdAlloc;
+ComPtr<ID3D12GraphicsCommandList>	_cmdList;
+
+ComPtr<ID3D12Fence>					_fence;
+uint32								_fenceValue = 0; // 시간상의 특정 울타리 지점을 식별하는 정수
+```
+
 1) [ID3D12CommandQueue](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12commandqueue) 선언  
 - 명령 목록을 제출  
 - 명령 목록 동기화  
 - 명령 큐 계측  
 - 리소스 타일 매핑을 업데이트하는 메서드 제공  
 
+```cpp
+D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+
+device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_cmdQueue));
+```
+
 2) [ID3D12CommandAllocator](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12commandallocator) 선언  
 - GPU 명령에 대한 스토리지 할당  
 - 명령 목록에 추가된 명령들은 이 할당자의 메모리에 저장된다.  
 - 여러 명령 목록을 연관시켜도 되지만, 기록중인 명력 목록 외에는 전부 Close()되어야 한다.
+
+```cpp
+device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_cmdAlloc));
+```
 
 3) [ID3D12GraphicsCommandList](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12graphicscommandlist) 선언  
 - 렌더링을 위한 그래픽 명령 목록을 캡슐화
@@ -157,13 +125,7 @@ private:
 - 파이프라인 상태 설정 및 지우기
 
 ```cpp
-D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-
-device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_cmdQueue));	// ID3D12CommandQueue
-device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_cmdAlloc));	// ID3D12CommandAllocator
-device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _cmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_cmdList));	// ID3D12GraphicsCommandList
+device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _cmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_cmdList));
 // 명령 기록이 끝났음을 기록한다.
 _cmdList->Close();
 ```
@@ -179,7 +141,6 @@ _fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 ```
 
 ---
-
 
 1) 렌더링 전 필요한 명력을 _cmdList에 추가하는 작업
 
@@ -269,37 +230,21 @@ if (_fence->GetCompletedValue() < _fenceValue)
 
 <br>
 
-## 🔹 SwaphChain Class
+## 🔹 SwapChain Class
 - 화면에 표시 될 정보를 관리하는 클래스  
 
-```cpp
-class SwapChain
-{
-public:
-	void Init(const WindowInfo& window, ComPtr<IDXGIFactory> dxgi, ComPtr<ID3D12CommandQueue> cmdQueue);
-
-public:
-	void Present();
-	void SwapIndex();
-	...
-
-private:
-	ComPtr<IDXGISwapChain>	_swapChain;
-	ComPtr<ID3D12Resource>	_renderTargets[SWAP_CHAIN_BUFFER_COUNT];
-	
-	...
-};
-```
 ---
-1) [IDXGISwapChain](https://learn.microsoft.com/ko-kr/windows/win32/api/dxgi/nn-dxgi-idxgiswapchain)
-- 렌더링된 데이터를 출력에 표시하기 전에 저장하기 위해 하나 이상의 Surface를 구현  
 
-2) [ID3D12Resource](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12resource)
+```cpp
+ComPtr<IDXGISwapChain>	_swapChain;
+ComPtr<ID3D12Resource>	_renderTargets[SWAP_CHAIN_BUFFER_COUNT];
+```
+
+1) [ID3D12Resource](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12resource)
 - CPU 및 GPU의 일반화된 기능을 캡슐화하여 실제 메모리 또는 힙을 읽고 쓸 수 있음  
 - 셰이더 샘플링에 최적화된 다차원 데이터 뿐만 아니라 간단한 데이터 배열을 구성하고 조작하기 위한 추상화가 포함됨   
 
 ```cpp
-// (1) 교환사슬 생성
 DXGI_SWAP_CHAIN_DESC chainDesc = {};
 chainDesc.BufferDesc.Width = static_cast<uint32>(window.width);
 chainDesc.BufferDesc.Height = static_cast<uint32>(window.height);
@@ -316,7 +261,12 @@ chainDesc.OutputWindow = window.hwnd;
 chainDesc.Windowed = window.windowed;
 chainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;		// 전면 후면 버퍼 교체 시 이전 프레임 정보 버림
 chainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+```
 
+2) [IDXGISwapChain](https://learn.microsoft.com/ko-kr/windows/win32/api/dxgi/nn-dxgi-idxgiswapchain)
+- 렌더링된 데이터를 출력에 표시하기 전에 저장하기 위해 하나 이상의 Surface를 구현  
+
+```cpp
 dxgi->CreateSwapChain(cmdQueue.Get(), &chainDesc, &_swapChain);
 
 // (2) 렌더링 대상이 되는 버퍼(ID3D12Resource) 가져옴
@@ -344,19 +294,21 @@ _backBufferIndex = (_backBufferIndex + 1) % SWAP_CHAIN_BUFFER_COUNT;
 - 화면에 표시되는 정보(RTV)를 생성하는 클래스  
 - 기안서  
 
-```cpp
-class DescriptorHeap
-{
-public:
-	void Init(ComPtr<ID3D12Device> device, shared_ptr<class SwapChain> swapChain);
-    ...
+> `view`  
+> - GPU자원들이 파이프라인에 직접 묶이는 것이 아닌 해당 자원을 참조하는 서술자 객체
+> - 자원을 GPU에게 서술해주는 경량의 자료구조  
 
-private:
-	ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
-	...
-};
-```
+> `heap`
+> - 응용프로그램이 사용하는 서술자들이 저장되는 곳
+>> - 서술자마다 개별적인 heap이 필요하다.
+>> - 같은 종류의 서술자들은 같은 서술자 힙에 저장된다.
+>> - 한 종류의 서술자에 대해 여러개의 heap을 둘 수 있다.
+
 ---
+
+```cpp
+ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
+```
 
 1) [ID3D12DescriptorHeap](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12descriptorheap)
 - 설명자의 연속 할당 컬렉션으로, 모든 설명자에 대한 하나의 할당  
@@ -366,7 +318,7 @@ private:
 // (1) 렌더 대상 뷰(RenderTargetView)의 크기 가져옴 (offset을 위함)
 _rtvHeapSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-// (2) RTV 생성
+// (2) 렌더 타겟 힙 생성
 D3D12_DESCRIPTOR_HEAP_DESC rtvDesc = {};
 rtvDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 rtvDesc.NumDescriptors = SWAP_CHAIN_BUFFER_COUNT;
@@ -375,13 +327,12 @@ rtvDesc.NodeMask = 0;
 
 device->CreateDescriptorHeap(&rtvDesc, IID_PPV_ARGS(&_rtvHeap));
 
-// (3) 
+// (3) RTV 설정
 D3D12_CPU_DESCRIPTOR_HANDLE rtvHeapBegin = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
 
 for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++)
 {
 	_rtvHandle[i] = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeapBegin, i * _rtvHeapSize);
-	// (4) RTV 생성
 	device->CreateRenderTargetView(swapChain->GetRenderTarget(i).Get(), nullptr, _rtvHandle[i]);
 }
 ```
