@@ -18,12 +18,19 @@ last_modified_at: 2023-02-10
 # 🔷 Index Buffer
 
 ## 1. IndexBuffer 설정
+- 색인을 담는 버퍼  
+
+---
 
 ```cpp
 ComPtr<ID3D12Resource>		_indexBuffer;
 D3D12_INDEX_BUFFER_VIEW		_indexBufferView = {};
 uint32						_indexCount = 0;
 ```
+
+1) [D3D12_INDEX_BUFFER_VIEW](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/ns-d3d12-d3d12_index_buffer_view)
+- 인덱스(색인) 버퍼 뷰에 대해 설명
+- `서술자 힙이 필요 없음`
 
 ```cpp
 _indexCount = static_cast<uint32>(ibvs.size());
@@ -58,8 +65,10 @@ _indexBufferView.SizeInBytes = bufferSize;                                  // �
 ## 2. IndexBuffer를 활용하여 물체 그리기
 
 ```cpp
+// 색인 버퍼를 입력조립기(IA)단계에 바인딩
 cmdList->IASetIndexBuffer(&_indexBufferView);
 ...
+// 색인을 이용한 기본도형 그리기
 cmdList->DrawIndexedInstanced(_indexCount, 1, 0, 0, 0);	// 실제로 그려짐
 ```
 
