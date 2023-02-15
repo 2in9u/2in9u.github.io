@@ -83,7 +83,7 @@ assert(_currentIndex < _elementSize);
 ::memcpy(&_mappedBuffer[_currentIndex * _elementSize], buffer, size);
 ```
 
-4) 상수버퍼 파이프라인에 바인딩
+4) 파이프라인에 상수버퍼 바인딩
 ```cpp
 D3D12_GPU_VIRTUAL_ADDRESS address = GetGpuVirtualAddress(_currentIndex);
 MyEngine->GetCommandQueue()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParamIndex, address);

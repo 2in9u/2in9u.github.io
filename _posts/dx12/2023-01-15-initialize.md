@@ -311,7 +311,7 @@ ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
 ```
 
 1) [ID3D12DescriptorHeap](https://learn.microsoft.com/ko-kr/windows/win32/api/d3d12/nn-d3d12-id3d12descriptorheap)
-- 설명자의 연속 할당 컬렉션으로, 모든 설명자에 대한 하나의 할당  
+- 설명자(descriptor)의 연속 할당 컬렉션으로, 모든 설명자에 대한 하나의 할당  
 - SRV, UAV, CBV, Sampler (파이프라인 상태 개체(Pipeline State Object:PSO)에 속하지 않은 유형)  
 
 ```cpp

@@ -23,7 +23,11 @@ last_modified_at: 2023-02-10
 
 <br>
 
+## 0. UV 좌표 설정
+- 사진 추가 예정
+
 ## 1. Texture Class
+- 텍스쳐를 불러와 관리해주는 클래스
 
 ```cpp
 #pragma once
@@ -47,93 +51,91 @@ private:
 };
 ```
 
+---
+
+1) 이미지 파일을 불러온다
+- C++17부터 지원하는 `#include <filesystem>`을 사용한다.
+- ⚠️ 충돌로 인해 `#define _HAS_STD_BYTE 0` 필요!
+
 ```cpp
-#include "pch.h"
-#include "Texture.h"
-#include "Engine.h"
-#include "Device.h"
-#include "CommandQueue.h"
-#include <filesystem>
+wstring ext = std::filesystem::path(path).extension();
 
-void Texture::Init(const wstring& path)
-{
-	CreateTexture(path);
-	CreateView();
-}
+if (ext == L".dds" || ext == L".DDS")
+	::LoadFromDDSFile(path.c_str(), DDS_FLAGS_NONE, nullptr, _image);
+else if (ext == L".tga" || ext == L".TGA")
+	::LoadFromTGAFile(path.c_str(), nullptr, _image);
+else // png, jpg, jpeg, bmp
+	::LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, nullptr, _image);
 
-void Texture::CreateTexture(const wstring& path)
-{
-	wstring ext = std::filesystem::path(path).extension();
+ComPtr<ID3D12Device> device = MyEngine->GetDevice()->GetDevice();
+HRESULT hr = ::CreateTexture(device.Get(), _image.GetMetadata(), &_tex2D);
+assert(SUCCEEDED(hr));
 
-	if (ext == L".dds" || ext == L".DDS")
-		::LoadFromDDSFile(path.c_str(), DDS_FLAGS_NONE, nullptr, _image);
-	else if (ext == L".tga" || ext == L".TGA")
-		::LoadFromTGAFile(path.c_str(), nullptr, _image);
-	else // png, jpg, jpeg, bmp
-		::LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, nullptr, _image);
+vector<D3D12_SUBRESOURCE_DATA> subResources;
 
-	ComPtr<ID3D12Device> device = MyEngine->GetDevice()->GetDevice();
-	HRESULT hr = ::CreateTexture(device.Get(), _image.GetMetadata(), &_tex2D);
-	assert(SUCCEEDED(hr));
+hr = ::PrepareUpload(
+	device.Get(),
+	_image.GetImages(),
+	_image.GetImageCount(),
+	_image.GetMetadata(),
+	subResources);
 
-	vector<D3D12_SUBRESOURCE_DATA> subResources;
+assert(SUCCEEDED(hr));
 
-	hr = ::PrepareUpload(
-		device.Get(),
-		_image.GetImages(),
-		_image.GetImageCount(),
-		_image.GetMetadata(),
-		subResources);
+const uint64 bufferSize = ::GetRequiredIntermediateSize(_tex2D.Get(), 0, static_cast<uint32>(subResources.size()));
 
-	assert(SUCCEEDED(hr));
+D3D12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
 
-	const uint64 bufferSize = ::GetRequiredIntermediateSize(_tex2D.Get(), 0, static_cast<uint32>(subResources.size()));
+ComPtr<ID3D12Resource> textureUploadHeap;
+hr = device->CreateCommittedResource(
+	&heapProperty,
+	D3D12_HEAP_FLAG_NONE,
+	&desc,
+	D3D12_RESOURCE_STATE_GENERIC_READ,
+	nullptr,
+	IID_PPV_ARGS(textureUploadHeap.GetAddressOf()));
 
-	D3D12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
+assert(SUCCEEDED(hr));
 
-	ComPtr<ID3D12Resource> textureUploadHeap;
-	hr = device->CreateCommittedResource(
-		&heapProperty,
-		D3D12_HEAP_FLAG_NONE,
-		&desc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(textureUploadHeap.GetAddressOf()));
+// 
+ComPtr<ID3D12GraphicsCommandList> resCmdList = MyEngine->GetCommandQueue()->GetResourceCommandList();
+::UpdateSubresources(
+	resCmdList.Get(),
+	_tex2D.Get(),
+	textureUploadHeap.Get(),
+	0, 0,
+	static_cast<unsigned int>(subResources.size()),
+	subResources.data());
 
-	assert(SUCCEEDED(hr));
+MyEngine->GetCommandQueue()->FlushResourceCommandQueue();
+```
 
-	ComPtr<ID3D12GraphicsCommandList> resCmdList = MyEngine->GetCommandQueue()->GetResourceCommandList();
-	::UpdateSubresources(
-		resCmdList.Get(),
-		_tex2D.Get(),
-		textureUploadHeap.Get(),
-		0, 0,
-		static_cast<unsigned int>(subResources.size()),
-		subResources.data());
+2) 텍스처를 저장하는 Resource 생성
 
-	MyEngine->GetCommandQueue()->FlushResourceCommandQueue();
-}
+```cpp
+```
 
-void Texture::CreateView()
-{
-	ComPtr<ID3D12Device> device = MyEngine->GetDevice()->GetDevice();
+3) 텍스처 Resource를 설명하는 설명자 힙 생성 (SRV)
 
-	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-	heapDesc.NumDescriptors = 1;
-	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&_srvHeap));
+```cpp
+ComPtr<ID3D12Device> device = MyEngine->GetDevice()->GetDevice();
 
-	_srvHandle = _srvHeap->GetCPUDescriptorHandleForHeapStart();
+D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+heapDesc.NumDescriptors = 1;
+heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&_srvHeap));
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc = {};
-	viewDesc.Format = _image.GetMetadata().format;
-	viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	viewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	viewDesc.Texture2D.MipLevels = 1;
-	device->CreateShaderResourceView(_tex2D.Get(), &viewDesc, _srvHandle);
-}
+_srvHandle = _srvHeap->GetCPUDescriptorHandleForHeapStart();
+
+// STV
+D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc = {};
+viewDesc.Format = _image.GetMetadata().format;
+viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+viewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+viewDesc.Texture2D.MipLevels = 1;
+device->CreateShaderResourceView(_tex2D.Get(), &viewDesc, _srvHandle);
 ```
 
 <br>
@@ -248,6 +250,3 @@ D3D12_INPUT_ELEMENT_DESC desc[] =
 # 📑. 참고
 * [Rookiss. [C++과 언리얼로 만드는 MMORPG 게임 개발 시리즈]Part2: 게임 수학과 DirectX12. Inflearn.](https://www.inflearn.com/course/%EC%96%B8%EB%A6%AC%EC%96%BC-3d-mmorpg-2/dashboard)
 * [프랭크 D. 루나(2020). DirectX 12를 이용한 3D게임 프로그래밍 입문. 한빛미디어(주).](https://www.hanbit.co.kr/store/books/look.php?p_code=B5088646371)
-
-
-

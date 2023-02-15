@@ -17,7 +17,7 @@ last_modified_at: 2023-02-15
 
 # 🔷 Depth Stencil View
 
-## 1. DepthStencilBuffer 클래스
+## 1. DepthStencilBuffer class
 - 깊이·스텐실 버퍼와 뷰를 생성 및 관리하는 클래스
 
 > `스텐실(Stencil)`
