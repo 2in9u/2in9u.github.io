@@ -23,6 +23,7 @@ last_modified_at: 2023-02-18
 
 ## 1. Component Class
 - Component의 최상위 클래스 
+
 ```cpp
 enum class COMPONENT_TYPE : uint8
 {
