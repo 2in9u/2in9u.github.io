@@ -184,5 +184,10 @@ if (_frameTime >= 1.f)
 
 <br>
 
+## 🔹 결과  
+![image](../../assets/images/dx12_img/09_input_timer/result.png)  
+
+<br>
+
 # 📑. 참고
 * [Rookiss. [C++과 언리얼로 만드는 MMORPG 게임 개발 시리즈]Part2: 게임 수학과 DirectX12. Inflearn.](https://www.inflearn.com/course/%EC%96%B8%EB%A6%AC%EC%96%BC-3d-mmorpg-2/dashboard)

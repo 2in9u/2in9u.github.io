@@ -74,6 +74,11 @@ cmdList->DrawIndexedInstanced(_indexCount, 1, 0, 0, 0);	// 실제로 그려짐
 
 <br>
 
+## 🔹 결과  
+![image](../../assets/images/dx12_img/06_indexbuffer/result.png)  
+
+<br>
+
 # 📑. 참고
 * [Rookiss. [C++과 언리얼로 만드는 MMORPG 게임 개발 시리즈]Part2: 게임 수학과 DirectX12. Inflearn.](https://www.inflearn.com/course/%EC%96%B8%EB%A6%AC%EC%96%BC-3d-mmorpg-2/dashboard)
 * [프랭크 D. 루나(2020). DirectX 12를 이용한 3D게임 프로그래밍 입문. 한빛미디어(주).](https://www.hanbit.co.kr/store/books/look.php?p_code=B5088646371)

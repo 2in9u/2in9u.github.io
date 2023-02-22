@@ -188,6 +188,10 @@ _cmdList->SetDescriptorHeaps(1, &descHeap);
 }
 MyEngine->GetTableDescriptorHeap()->CommitTable();
 ```
+<br>
+
+## 🔹 결과  
+![image](../../assets/images/dx12_img/05_descriptortable/result.png)  
 
 <br>
 
