@@ -47,7 +47,7 @@ $$sgn(\delta)=\begin{cases}+1 & (\delta : 짝치환) \\ -1 & (\delta : 홀치환
 > ※ 치환에서 두 수의 순서가 바뀌면 부호가 바뀐다.  
 
 ## 행렬식 (Leibniz Formula)
-- 행렬 A=[$a_{ij}$]가 n차 정사각 행렬일 때, A의 행렬식( $det(A), |A|$ )의 정의  (Sarrus 방법)
+- 행렬 A=[$a_{ij}$]가 n차 정사각 행렬일 때, A의 행렬식( $det(A), |A|$ )의 정의  (Sarrus 방법)  
 $$det(A) = |A| = \sum_{\delta \in S_n} {sgn(\delta)a_{1 \delta(1)}a_{2 \delta(2)} \dots a_{n \delta(n)}}$$  
 ![image](../../assets/images/liner_algebra/04_determinant/sarrus.png)  
 ※ 행렬 A의 행과 열에서 중복없이 하나씩 뽑아서 곱한 후 대응되는 치환의 부호를 붙인 것.  
